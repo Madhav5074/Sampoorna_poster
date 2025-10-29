@@ -19,8 +19,11 @@
         
         #posterWrapper {
             position: relative;
+            /* Based on your 3375x6030 image, the aspect ratio is 0.5597
+               We'll use a max-width based on a scaled-down 562px width
+            */
             width: 100%;
-            max-width: 562px; /* Based on original image aspect ratio */
+            max-width: 562px; 
             margin: auto;
             border: 2px solid #e2e8f0;
             border-radius: 1.5rem;
@@ -41,13 +44,23 @@
             height: 100%;
         }
 
+        /* --- ALL COORDINATES BELOW ARE NOW BASED ON YOUR EXACT NUMBERS --- */
+
         #employeePhotoPreview {
             position: absolute;
-            /* Percentages based on your 3375x6030 image */
-            top: 64.67%;
-            left: 18.75%;
-            width: 23.11%;
-            height: 12.93%;
+            /* Image: 3375x6030
+              Center: (933, 4275)
+              Size: 488x487
+              
+              left: (933 - (488 / 2)) / 3375 = (933 - 244) / 3375 = 689 / 3375 = 20.41%
+              top: (4275 - (487 / 2)) / 6030 = (4275 - 243.5) / 6030 = 4031.5 / 6030 = 66.86%
+              width: 488 / 3375 = 14.46%
+              height: 487 / 6030 = 8.08%
+            */
+            top: 66.86%;
+            left: 20.41%;
+            width: 14.46%;
+            height: 8.08%;
             border-radius: 50%;
             object-fit: cover; 
             background-color: #00aef0;
@@ -57,37 +70,44 @@
             position: absolute;
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            font-size: 1.55vw; 
+            /* FONT SMALLER: Reduced from 1.55vw to 1.4vw
+            */
+            font-size: 1.4vw; 
             color: #0a304f;
             white-space: nowrap; 
         }
         
         @media (min-width: 562px) {
             .poster-text {
-                font-size: 8.7px; 
+                /* Recalculated for new font size: 1.4 * 5.62 = 7.868 */
+                font-size: 7.87px; 
             }
         }
         
-        /* Positions based on your 3375x6030 image coordinates */
+        /* Text Positions:
+          Based on Image: 3375x6030
+          X-Start: 1498px -> (1498 / 3375) = 44.385%
+        */
+        
         #p-name {
-            left: 44%;
-            top: 66.91%;
+            left: 44.39%;
+            top: 66.42%; /* (4005 / 6030) */
         }
         #p-branch {
-            left: 44%;
-            top: 68.60%; 
+            left: 44.39%;
+            top: 68.34%; /* (4121 / 6030) */
         }
         #p-region {
-            left: 44%;
-            top: 70.03%; 
+            left: 44.39%;
+            top: 70.03%; /* (4223 / 6030) */
         }
         #p-premium {
-            left: 44%;
-            top: 71.69%; 
+            left: 44.39%;
+            top: 72.29%; /* (4359 / 6030) */
         }
         #p-nop {
-            left: 44%;
-            top: 73.33%; 
+            left: 44.39%;
+            top: 74.13%; /* (4470 / 6030) */
         }
         
         #posterContainer, #loadingIndicator {
@@ -165,7 +185,7 @@
                     <img id="employeePhotoPreview" src="" alt="Employee Photo">
                     
                     <p id="p-name" class="poster-text"></p>
-                    <p id="p-branch" class="poster-text"></p>
+                    <p id="p-branch" classG="poster-text"></p>
                     <p id="p-region" class="poster-text"></p>
                     <p id="p-premium" class="poster-text"></p>
                     <p id="p-nop" class="poster-text"></p>
@@ -178,7 +198,7 @@
     </div>
     
     <div class="version-number">
-        Version 3.3.1 - Pixel Perfect
+        Version 3.4 - Final Coords
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
@@ -198,10 +218,8 @@
         const pPremium = document.getElementById('p-premium');
         const pNop = document.getElementById('p-nop');
         
-        // Error handling for the background image
         const posterBg = document.getElementById('posterBg');
         posterBg.onerror = function() {
-            // This error will trigger if 'sampoorna-bg.png' is not found
             showMessage("Error: Could not load 'sampoorna-bg.png'. Make sure it is in the same folder as the HTML file and the name is all lowercase.");
         };
 
@@ -225,7 +243,6 @@
                 return;
             }
             
-            // Check if background image loaded
             if (posterBg.complete === false || posterBg.naturalHeight === 0) {
                  showMessage("Error: Background image 'sampoorna-bg.png' is missing or could not be loaded. Please check the file name and location.");
                  return;
