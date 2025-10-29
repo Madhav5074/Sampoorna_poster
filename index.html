@@ -17,22 +17,22 @@
             margin: auto;
         }
         
-        /* This is the new poster area. No more canvas! */
+        /* This is the main poster area */
         #posterWrapper {
-            /* This is the key: we use the original image's width.
-              The background image will fill this container.
-            */
             position: relative;
+            /* We use the original image's width as the max-width
+               to ensure our % calculations are based on it.
+            */
             width: 100%;
-            max-width: 562px; /* Original image width */
+            max-width: 562px; /* This is the 3375px downscaled by 6x */
             margin: auto;
             border: 2px solid #e2e8f0;
             border-radius: 1.5rem;
-            overflow: hidden; /* This clips the photo circle */
+            overflow: hidden; /* Clips the photo circle */
         }
         
         #posterBg {
-            /* The background image itself */
+            /* The background image */
             width: 100%;
             height: auto;
             display: block; /* Removes any bottom spacing */
@@ -50,14 +50,20 @@
         /* This is the employee's photo */
         #employeePhotoPreview {
             position: absolute;
-            /* These % values are calculated from the original image.
-              (top: 647px / 1000px height = 64.7%)
-              (left: 117px / 562px width = 20.8%)
+            /* These are your (X,Y) coordinates converted to percentages
+              Based on your 3375x6030 image
+              Circle Center: (1023, 4290)
+              Estimated Radius: 390px (based on scaling from the template)
+              
+              top: (4290 - 390) / 6030 = 64.67%
+              left: (1023 - 390) / 3375 = 18.75%
+              width: (390 * 2) / 3375 = 23.11%
+              height: (390 * 2) / 6030 = 12.93%
             */
-            top: 64.7%;
-            left: 20.8%;
-            width: 23%;   /* (130px / 562px) */
-            height: 13%;  /* (130px / 1000px) */
+            top: 64.67%;
+            left: 18.75%;
+            width: 23.11%;
+            height: 12.93%;
             border-radius: 50%;
             object-fit: cover; /* This makes the image fill the circle nicely */
             background-color: #00aef0; /* Fallback color */
@@ -68,8 +74,8 @@
             position: absolute;
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            /* Using 'vw' (viewport width) makes the font scale with the poster size.
-              We use a media query to set a fixed size when the viewport is larger.
+            /* This font-size scales with the poster width.
+              1.55vw is (8.7px / 562px) * 100
             */
             font-size: 1.55vw; 
             color: #0a304f; /* Dark blue from poster */
@@ -84,28 +90,33 @@
             }
         }
         
-        /* Here we position each text element individually.
-          The % values are calculated from the original image.
+        /* Here we position each text element using your exact coordinates
+          converted to percentages.
+          
+          Example: Name
+          X: 1485px -> (1485 / 3375) * 100% = 44%
+          Y: 4035px -> (4035 / 6030) * 100% = 66.91%
         */
+        
         #p-name {
-            top: 65.1%; /* (651px / 1000px) */
-            left: 58.7%;  /* (330px / 562px) - after the "Name: " label */
+            left: 44%;
+            top: 66.91%;
         }
         #p-branch {
-            top: 67.9%;
-            left: 58.7%;
+            left: 44%;
+            top: 68.60%; /* (4137 / 6030) */
         }
         #p-region {
-            top: 70.7%;
-            left: 58.7%;
+            left: 44%;
+            top: 70.03%; /* (4223 / 6030) */
         }
         #p-premium {
-            top: 73.5%;
-            left: 73.8%; /* Further right, after "Premium Amount: " */
+            left: 44%;
+            top: 71.69%; /* (4323 / 6030) */
         }
         #p-nop {
-            top: 76.3%;
-            left: 55.2%; /* After "NOP: " */
+            left: 44%;
+            top: 73.33%; /* (4422 / 6030) */
         }
         
         #posterContainer, #loadingIndicator {
@@ -196,7 +207,7 @@
     </div>
     
     <div class="version-number">
-        Version 3.2 - CSS Overlay
+        Version 3.3 - Pixel Perfect
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
@@ -209,7 +220,6 @@
         const downloadBtn = document.getElementById('downloadBtn');
         const premiumInput = document.getElementById('premium');
 
-        // References to the new poster elements
         const employeePhotoPreview = document.getElementById('employeePhotoPreview');
         const pName = document.getElementById('p-name');
         const pBranch = document.getElementById('p-branch');
@@ -240,12 +250,8 @@
             posterForm.style.display = 'none';
             loadingIndicator.style.display = 'flex';
 
-            // We don't need to load the template, it's already in the HTML.
-            // We just need to load the employee photo.
             const reader = new FileReader();
             reader.onload = function(e) {
-                // This function is much simpler now!
-                // It just updates the text and image sources.
                 drawPoster(e.target.result, {
                     employeeName: document.getElementById('employeeName').value,
                     branch: document.getElementById('branch').value,
@@ -254,11 +260,10 @@
                     nop: document.getElementById('nop').value
                 });
                 
-                // Use a small timeout to make sure images have rendered
                 setTimeout(() => {
                     loadingIndicator.style.display = 'none';
                     posterContainer.style.display = 'flex';
-                }, 100); // 100ms delay
+                }, 100);
             };
             reader.readAsDataURL(file);
         });
@@ -282,7 +287,6 @@
             }
         }
 
-        // This function is now simple, just updating the HTML.
         function drawPoster(employeeImageSrc, data) {
             employeePhotoPreview.src = employeeImageSrc;
             
@@ -293,23 +297,18 @@
             pNop.innerText = data.nop;
         }
 
-        // The new download function using html2canvas
         downloadBtn.addEventListener('click', function() {
             const posterToDownload = document.getElementById('posterWrapper');
             
-            // html2canvas options for better quality
             const options = {
-                scale: 3, // Increase scale for higher resolution (3x)
-                useCORS: true, // For images from other origins
-                // Set a white background for any potential transparency
-                backgroundColor: '#ffffff' 
+                scale: 3, // Increase scale for high resolution
+                useCORS: true,
+                backgroundColor: '#ffffff'
             };
 
             html2canvas(posterToDownload, options).then(canvas => {
-                // Convert the canvas (our "screenshot") to a data URL
                 const imageDataUrl = canvas.toDataURL('image/png');
                 
-                // Create a temporary link to download it
                 const downloadLink = document.createElement('a');
                 downloadLink.download = `sampoorna-poster-${Date.now()}.png`;
                 downloadLink.href = imageDataUrl;
