@@ -11,23 +11,21 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f4f8;
-            /* Ensure body allows centering */
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 1.5rem; /* Re-added padding from previous versions */
+            padding: 1.5rem; 
         }
-        /* FORM CONTAINER FIX */
         .container {
-            width: 100%; /* Take full width up to max-width */
+            width: 100%; 
             max-width: 550px;
-            margin-left: auto; /* Center the container */
+            margin-left: auto; 
             margin-right: auto;
-            background-color: white; /* Ensure it has background */
-            padding: 2.5rem; /* Re-added padding */
-            border-radius: 1.5rem; /* Re-added */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Re-added */
+            background-color: white; 
+            padding: 2.5rem; 
+            border-radius: 1.5rem; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
         }
         
         #posterWrapper {
@@ -68,9 +66,9 @@
         #text-container {
             position: absolute;
             left: 43.34%; 
-            top: 67.27%;   
+            top: 66.8%;   /* Adjusted slightly for larger text */
             width: 33.89%; 
-            height: 7.5%; 
+            height: 9%; /* Increased height slightly */
 
             display: flex;
             flex-direction: column;
@@ -82,31 +80,31 @@
         .poster-text {
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            font-size: 1.0vw; 
+            /* FONT BIGGER: Increased by 30% from 1.0vw to 1.3vw */
+            font-size: 1.3vw; 
             color: #0a304f;
             white-space: nowrap;
-            line-height: 1.3; 
+            line-height: 1.4; /* Adjusted line spacing */
         }
         
         @media (min-width: 562px) {
             .poster-text {
-                font-size: 5.66px; 
+                /* Fixed font size at max width: 1.3 * 5.62 = 7.31px */
+                font-size: 7.31px; 
             }
         }
         
-        /* FORM FONT SIZE ADJUSTMENT */
         #posterForm label,
         #posterForm input,
         #posterForm select,
         #posterForm button {
-            font-size: 0.95rem; /* Slightly smaller than default */
+            font-size: 0.95rem; 
         }
         
         #posterContainer, #loadingIndicator {
             display: none;
         }
 
-        /* FIXED ELEMENT POSITION FIX */
         .version-number {
             position: fixed;
             bottom: 1rem;
@@ -136,7 +134,11 @@
         }
     </style>
 </head>
-<body class="bg-gray-100"> <div class="container bg-white p-10 rounded-3xl shadow-2xl flex flex-col gap-8 my-10"> <form id="posterForm" class="flex flex-col gap-6">
+<body class="bg-gray-100"> 
+
+    <div class="container bg-white p-10 rounded-3xl shadow-2xl flex flex-col gap-8 my-10"> 
+
+        <form id="posterForm" class="flex flex-col gap-6">
             <h1 class="text-4xl font-extrabold text-center text-blue-900 mb-2">Sampoorna 2.0 Poster</h1>
 
             <div>
@@ -204,7 +206,7 @@
     </div>
     
     <div class="version-number">
-        Version 3.10 - Form Layout Fixed
+        Version 3.11 - Font Size Increased
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
