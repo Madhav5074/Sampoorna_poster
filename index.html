@@ -116,7 +116,7 @@
     </div>
     
     <div class="version-number">
-        Version 3.0 - Sampoorna
+        Version 3.1 - Sampoorna (Aligned)
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
@@ -130,8 +130,7 @@
         const loadingIndicator = document.getElementById('loadingIndicator');
         const premiumInput = document.getElementById('premium');
 
-        // *** THIS LINE IS NOW CORRECTED to match your screenshot (lowercase 's') ***
-        const templateUrl = './sampoorna-bg.PNG';
+        const templateUrl = './sampoorna-bg.PNG'; // Confirmed case from your screenshot
 
         premiumInput.addEventListener('input', function(event) {
             const value = this.value.replace(/[^0-9]/g, '');
@@ -228,26 +227,44 @@
             // 1. Draw the background template
             ctx.drawImage(templateBg, 0, 0, canvasWidth, canvasHeight);
 
-            // 2. Cover up the old placeholder text and circle
+            // Using the new image as reference:
+            // The template image is 562px wide by 1000px high.
+            // Our canvas is 1080px wide by 1920px high.
+            // Scaling factor: canvasWidth / originalWidth = 1080 / 562 = 1.9217...
+
+            const scaleFactor = canvasWidth / 562;
+
+            // --- 2. Cover up the old placeholder text and circle ---
             
-            // Cover yellow text box
+            // Coordinates from your screenshot for the yellow box
+            const originalRectX = 250;
+            const originalRectY = 650;
+            const originalRectW = 290;
+            const originalRectH = 150;
+
+            const rectX = originalRectX * scaleFactor;
+            const rectY = originalRectY * scaleFactor;
+            const rectW = originalRectW * scaleFactor;
+            const rectH = originalRectH * scaleFactor;
+
             ctx.fillStyle = '#fde88f'; // Color picked from your image
-            const rectX = (250 / 562) * canvasWidth;
-            const rectY = (650 / 1000) * canvasHeight;
-            const rectW = (290 / 562) * canvasWidth;
-            const rectH = (150 / 1000) * canvasHeight;
             ctx.fillRect(rectX, rectY, rectW, rectH);
 
-            // Cover blue circle
+            // Coordinates from your screenshot for the blue circle
+            const originalCircleX = 175;
+            const originalCircleY = 680;
+            const originalCircleR = 65; 
+
+            const circleX = originalCircleX * scaleFactor;
+            const circleY = originalCircleY * scaleFactor;
+            const circleR = originalCircleR * scaleFactor;
+
             ctx.fillStyle = '#00aef0'; // Color picked from your image
-            const circleX = (175 / 562) * canvasWidth;
-            const circleY = (680 / 1000) * canvasHeight;
-            const circleR = (65 / 562) * canvasWidth; 
             ctx.beginPath();
             ctx.arc(circleX, circleY, circleR, 0, Math.PI * 2);
             ctx.fill();
 
-            // 3. Draw the new employee photo
+            // --- 3. Draw the new employee photo ---
             ctx.save();
             ctx.beginPath();
             ctx.arc(circleX, circleY, circleR, 0, Math.PI * 2);
@@ -269,24 +286,27 @@
             );
             ctx.restore();
 
-            // 4. Draw the new text
+            // --- 4. Draw the new text ---
             ctx.fillStyle = '#0a304f'; 
-            ctx.font = 'bold 36px Inter, sans-serif';
+            ctx.font = 'bold ' + (36 * scaleFactor * 0.9).toFixed(0) + 'px Inter, sans-serif'; // Adjusted font size slightly
             ctx.textAlign = 'left';
 
-            let textX = rectX + 15; 
-            let textY = rectY + 45;  
-            const lineHeight = 50;  
+            // Base X position for text (aligned with "Name:" label in background image)
+            const baseTextX = (270 / 562) * canvasWidth; 
+            
+            // Base Y positions for each line, relative to the top of the yellow box
+            let currentTextY = (692 / 1000) * canvasHeight; // Aligned with 'Name'
+            const lineHeight = (30 / 1000) * canvasHeight; // Spacing between lines
 
-            ctx.fillText(`Name: ${data.employeeName}`, textX, textY);
-            textY += lineHeight;
-            ctx.fillText(`Branch: ${data.branch}`, textX, textY);
-            textY += lineHeight;
-            ctx.fillText(`Region: ${data.region}`, textX, textY);
-            textY += lineHeight;
-            ctx.fillText(`Premium Amount: ${data.premium}`, textX, textY);
-            textY += lineHeight;
-            ctx.fillText(`NOP: ${data.nop}`, textX, textY);
+            ctx.fillText(`${data.employeeName}`, baseTextX, currentTextY);
+            currentTextY += lineHeight;
+            ctx.fillText(`${data.branch}`, baseTextX, currentTextY);
+            currentTextY += lineHeight;
+            ctx.fillText(`${data.region}`, baseTextX, currentTextY);
+            currentTextY += lineHeight;
+            ctx.fillText(`${data.premium}`, baseTextX, currentTextY);
+            currentTextY += lineHeight;
+            ctx.fillText(`${data.nop}`, baseTextX, currentTextY);
         }
 
         downloadBtn.addEventListener('click', function() {
