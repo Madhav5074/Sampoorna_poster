@@ -31,9 +31,8 @@
         #posterWrapper {
             position: relative;
             width: 100%;
-            /* Fixed width for pixel calculations */
+            /* Fixed width based on scaled template */
             width: 562px;
-            /* Height based on aspect ratio (6030 / 3375 * 562) = 1000px */
             height: 1000px;
             margin: auto;
             border: 2px solid #e2e8f0;
@@ -45,7 +44,7 @@
             width: 100%;
             height: 100%;
             display: block;
-            object-fit: cover; /* Cover the area */
+            object-fit: cover;
         }
 
         .overlay-container {
@@ -57,21 +56,14 @@
         }
 
         /* --- USING PIXEL COORDINATES based on 562x1000px size --- */
-        /* Original calculations based on 3375x6030 */
-        /* Scale Factor = 562 / 3375 = 0.1665 */
 
         #employeePhotoPreview {
             position: absolute;
-             /* Center:(933, 4275), Size:(488, 487)
-                left: (933 - 244) * scaleFactor = 689 * 0.1665 = 114.7px
-                top: (4275 - 243.5) * scaleFactor = 4031.5 * 0.1665 = 671.4px
-                width: 488 * scaleFactor = 81.3px
-                height: 487 * scaleFactor = 81.1px
-             */
-            top: 671px; /* Rounded */
-            left: 115px; /* Rounded */
-            width: 81px; /* Rounded */
-            height: 81px; /* Rounded */
+            /* Center:(933, 4275), Size:(488, 487) scaled */
+            top: 671px;
+            left: 115px;
+            width: 81px;
+            height: 81px;
             border-radius: 50%;
             object-fit: cover;
             background-color: #00aef0;
@@ -79,31 +71,27 @@
 
         #text-container {
             position: absolute;
-            /* Left based on X=1498px -> 1498 * scaleFactor = 249.4px */
-            left: 249px; /* Rounded */
-             /* Top based on Name Y=4005px -> 4005 * scaleFactor = 666.8px - adjusting slightly */
-            top: 666px; /* Rounded */
-            /* Width based on rect 1144px -> 1144 * scaleFactor = 190.5px */
-            width: 191px; /* Rounded */
-             /* Height based on rect 577px -> 577 * scaleFactor = 96px, adjusted for font */
-            height: 96px; /* Rounded */
+            left: 249px;
+            /* Slightly adjusted top position again */
+            top: 665px; /* Was 666px */
+            width: 191px;
+            height: 98px; /* Slightly adjusted height */
 
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
-            padding-left: 2px; /* Fixed padding */
+            padding-left: 2px;
         }
 
         .poster-text {
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            /* FONT SIZE: Using the calculated 8.43px */
-            font-size: 8.43px;
+            font-size: 8.43px; /* Fixed pixel size */
             color: #0a304f;
             white-space: nowrap;
-            /* Line height relative to font size */
-            line-height: 1.4;
+            /* Slightly adjusted line height */
+            line-height: 1.35; /* Was 1.4 */
         }
 
         /* Removed media query as font size is fixed now */
@@ -220,7 +208,7 @@
     </div>
 
     <div class="version-number">
-        Version 3.14 - Pixel Coords
+        Version 3.15 - Pixel Coords Tweaked
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
@@ -283,11 +271,10 @@
                     nop: document.getElementById('nop').value
                 });
 
-                // Increased delay slightly before showing container
                 setTimeout(() => {
                     loadingIndicator.style.display = 'none';
                     posterContainer.style.display = 'flex';
-                }, 200); // 200ms delay
+                }, 200);
             };
             reader.readAsDataURL(file);
         });
@@ -327,10 +314,13 @@
             const options = {
                 scale: 3,
                 useCORS: true,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                // Adding scrollX/Y might help if elements are slightly off-screen during capture
+                scrollX: 0,
+                scrollY: -window.scrollY 
             };
             
-            // Add a small delay before running html2canvas
+            // Increased delay before running html2canvas even more
             setTimeout(() => {
                 html2canvas(posterToDownload, options).then(canvas => {
                     const imageDataUrl = canvas.toDataURL('image/png');
@@ -343,7 +333,7 @@
                     downloadLink.click();
                     document.body.removeChild(downloadLink);
                 });
-            }, 500); // 500ms delay before screenshot
+            }, 700); // 700ms delay before screenshot
 
         });
     </script>
