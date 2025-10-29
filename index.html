@@ -41,13 +41,10 @@
             height: 100%;
         }
 
-        /* --- ALL COORDINATES BELOW ARE BASED ON YOUR EXACT NUMBERS --- */
-
         #employeePhotoPreview {
             position: absolute;
-            /* Based on Center:(933, 4275) and Size:(488, 487) from 3375x6030 image */
-            /* Slightly down */
-            top: 66.91%; /* Was 66.86% */
+            /* MOVED DOWN SLIGHTLY */
+            top: 67.01%; /* Was 66.91% */
             left: 20.41%;
             width: 14.46%;
             height: 8.08%;
@@ -56,15 +53,13 @@
             background-color: #00aef0;
         }
 
-        /* TEXT CONTAINER: 
-           - Adjusted size and position for larger text
-        */
         #text-container {
             position: absolute;
             left: 43.34%; 
-            top: 67.0%;   /* Adjusted slightly for larger text height */
+            /* MOVED DOWN SLIGHTLY */
+            top: 67.1%;   /* Was 67.0% */
             width: 33.89%; 
-            height: 7.5%; /* Increased height for larger text */
+            height: 7.5%; 
 
             display: flex;
             flex-direction: column;
@@ -76,16 +71,14 @@
         .poster-text {
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            /* FONT BIGGER: Increased by 20% from 0.84vw to 1.0vw */
             font-size: 1.0vw; 
             color: #0a304f;
             white-space: nowrap;
-            line-height: 1.3; /* Adjusted line spacing for larger text */
+            line-height: 1.3; 
         }
         
         @media (min-width: 562px) {
             .poster-text {
-                /* Fixed font size at max width: 1.0 * 5.62 = 5.62px */
                 font-size: 5.66px; 
             }
         }
@@ -180,7 +173,7 @@
     </div>
     
     <div class="version-number">
-        Version 3.7 - Larger Text, Circle Adjusted
+        Version 3.8 - Final Nudge Down
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
