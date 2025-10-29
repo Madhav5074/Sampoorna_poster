@@ -6,6 +6,7 @@
     <title>Sampoorna 2.0 Poster Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -15,31 +16,93 @@
             max-width: 550px;
             margin: auto;
         }
-        canvas {
+
+        /* This is the new poster area */
+        #posterWrapper {
+            /* This holds our background image.
+              We use the original image's aspect ratio (1000 / 562) 
+              to set the padding-top, making it responsive.
+            */
+            position: relative;
+            width: 100%;
+            max-width: 562px; /* Original image width */
+            margin: auto;
             border: 2px solid #e2e8f0;
             border-radius: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* Clips the photo circle */
+        }
+        #posterBg {
             width: 100%;
             height: auto;
-            max-width: 1080px;
+            display: block;
         }
-        #posterCanvas, #downloadBtn, #loadingIndicator {
+
+        /* Container for all overlay elements */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Styles for the employee photo */
+        #employeePhotoPreview {
+            position: absolute;
+            /* Coordinates are percentages based on the template.
+              TWEAK THESE if they are slightly off.
+            */
+            top: 64.7%; /* (original 647px / 1000px height) */
+            left: 20.8%;  /* (original 117px / 562px width) */
+            width: 23%;   /* (original 130px / 562px width) */
+            height: 13%;  /* (original 130px / 1000px height) */
+            border-radius: 50%;
+            object-fit: cover; /* Ensures the image fills the circle */
+            background-color: #00aef0; /* Fallback color */
+        }
+
+        /* Styles for the text data */
+        .poster-text {
+            position: absolute;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1.55vw; /* Scales with container width */
+            color: #0a304f;
+            /* Set a fixed size in a small container to override font-size */
+            @media (min-width: 562px) {
+                font-size: 8.7px; /* 1.55vw at 562px */
+            }
+        }
+        
+        /* Each text line is positioned absolutely.
+          TWEAK top/left percentages if alignment is off.
+        */
+        #p-name {
+            top: 65.1%;
+            left: 58.7%;
+        }
+        #p-branch {
+            top: 67.9%;
+            left: 58.7%;
+        }
+        #p-region {
+            top: 70.7%;
+            left: 58.7%;
+        }
+        #p-premium {
+            top: 73.5%;
+            left: 73.8%;
+        }
+        #p-nop {
+            top: 76.3%;
+            left: 55.2%;
+        }
+        
+        /* Hide all the poster elements by default */
+        #posterContainer, #loadingIndicator {
             display: none;
         }
-        .version-number {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            font-size: 0.875rem;
-            color: #9ca3af;
-        }
-        .copyright-text {
-            position: fixed;
-            bottom: 1rem;
-            left: 1rem;
-            font-size: 0.875rem;
-            color: #9ca3af;
-        }
+
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             width: 36px;
@@ -49,12 +112,8 @@
             animation: spin 1s ease infinite;
         }
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -66,12 +125,10 @@
             <h1 class="text-4xl font-extrabold text-center text-blue-900 mb-2">Sampoorna 2.0 Poster</h1>
 
             <div>
-                <label for="employeePhoto" class="block text-sm font-semibold text-gray-700 mb-2">Upload Employee Photo</label>
-                <input type="file" id="employeePhoto" accept="image/*" required class="w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-full file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
+                <label for="employeePhotoUpload" class="block text-sm font-semibold text-gray-700 mb-2">Upload Employee Photo</label>
+                <input type="file" id="employeePhotoUpload" accept="image/*" required class="w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0
+                    file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700
                     hover:file:bg-blue-100 cursor-pointer">
             </div>
             
@@ -109,14 +166,27 @@
         </div>
 
         <div id="posterContainer" class="flex flex-col items-center gap-6">
-            <canvas id="posterCanvas" width="1080" height="1920"></canvas>
+            <div id="posterWrapper">
+                <img id="posterBg" src="./sampoorna-bg.PNG" alt="Sampoorna Poster Background">
+                
+                <div class="overlay-container">
+                    <img id="employeePhotoPreview" src="" alt="Employee Photo">
+                    
+                    <p id="p-name" class="poster-text"></p>
+                    <p id="p-branch" class="poster-text"></p>
+                    <p id="p-region" class="poster-text"></p>
+                    <p id="p-premium" class="poster-text"></p>
+                    <p id="p-nop" class="poster-text"></p>
+                </div>
+            </div>
+            
             <button id="downloadBtn" class="bg-gradient-to-r from-green-600 to-green-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:from-green-700 hover:to-green-900 transition duration-300 transform hover:scale-105">Download Poster</button>
         </div>
         
     </div>
     
     <div class="version-number">
-        Version 3.1 - Sampoorna (Aligned)
+        Version 3.2 - CSS Overlay
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
@@ -124,13 +194,18 @@
 
     <script>
         const posterForm = document.getElementById('posterForm');
-        const posterCanvas = document.getElementById('posterCanvas');
-        const ctx = posterCanvas.getContext('2d');
-        const downloadBtn = document.getElementById('downloadBtn');
         const loadingIndicator = document.getElementById('loadingIndicator');
+        const posterContainer = document.getElementById('posterContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
         const premiumInput = document.getElementById('premium');
 
-        const templateUrl = './sampoorna-bg.PNG'; // Confirmed case from your screenshot
+        // References to the new poster elements
+        const employeePhotoPreview = document.getElementById('employeePhotoPreview');
+        const pName = document.getElementById('p-name');
+        const pBranch = document.getElementById('p-branch');
+        const pRegion = document.getElementById('p-region');
+        const pPremium = document.getElementById('p-premium');
+        const pNop = document.getElementById('p-nop');
 
         premiumInput.addEventListener('input', function(event) {
             const value = this.value.replace(/[^0-9]/g, '');
@@ -144,7 +219,7 @@
         posterForm.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const employeePhotoInput = document.getElementById('employeePhoto');
+            const employeePhotoInput = document.getElementById('employeePhotoUpload');
             const file = employeePhotoInput.files[0];
             
             if (!file) {
@@ -155,51 +230,27 @@
             posterForm.style.display = 'none';
             loadingIndicator.style.display = 'flex';
 
-            const data = {
-                employeeName: document.getElementById('employeeName').value,
-                branch: document.getElementById('branch').value,
-                region: document.getElementById('region').value,
-                premium: document.getElementById('premium').value,
-                nop: document.getElementById('nop').value
-            };
-
+            // We don't need to load the template, it's already in the HTML.
+            // We just need to load the employee photo.
             const reader = new FileReader();
-            reader.onload = function(event) {
-                const employeeImage = new Image();
-                employeeImage.src = event.target.result;
-
-                const templateBg = new Image();
-                templateBg.src = templateUrl;
+            reader.onload = function(e) {
+                // This function is much simpler now!
+                // It just updates the text and image sources.
+                drawPoster(e.target.result, {
+                    employeeName: document.getElementById('employeeName').value,
+                    branch: document.getElementById('branch').value,
+                    region: document.getElementById('region').value,
+                    premium: document.getElementById('premium').value,
+                    nop: document.getElementById('nop').value
+                });
                 
-                let loadedCount = 0;
-                const totalToLoad = 2; 
-                
-                const checkIfLoaded = () => {
-                    loadedCount++;
-                    if (loadedCount === totalToLoad) {
-                        drawPoster(employeeImage, templateBg, data);
-                        loadingIndicator.style.display = 'none';
-                        posterCanvas.style.display = 'block';
-                        downloadBtn.style.display = 'block';
-                    }
-                };
-
-                employeeImage.onload = checkIfLoaded;
-                templateBg.onload = checkIfLoaded;
-                
-                employeeImage.onerror = () => { console.error("Employee image failed to load."); checkIfLoaded(); };
-                templateBg.onerror = () => { 
-                    console.error("Template background failed to load. Make sure it's saved as 'sampoorna-bg.PNG'"); 
-                    showMessage("Error: Could not load 'sampoorna-bg.PNG'. Make sure it is in the same folder as the HTML file.");
-                    loadingIndicator.style.display = 'none';
-                    posterForm.style.display = 'flex';
-                };
+                loadingIndicator.style.display = 'none';
+                posterContainer.style.display = 'flex';
             };
             reader.readAsDataURL(file);
         });
 
         function showMessage(message) {
-            const container = document.querySelector('.container');
             let messageBox = document.getElementById('messageBox');
             if (!messageBox) {
                 messageBox = document.createElement('div');
@@ -218,105 +269,40 @@
             }
         }
 
-        function drawPoster(employeeImage, templateBg, data) {
-            const canvasWidth = 1080;
-            const canvasHeight = 1920; 
-            posterCanvas.width = canvasWidth;
-            posterCanvas.height = canvasHeight;
-
-            // 1. Draw the background template
-            ctx.drawImage(templateBg, 0, 0, canvasWidth, canvasHeight);
-
-            // Using the new image as reference:
-            // The template image is 562px wide by 1000px high.
-            // Our canvas is 1080px wide by 1920px high.
-            // Scaling factor: canvasWidth / originalWidth = 1080 / 562 = 1.9217...
-
-            const scaleFactor = canvasWidth / 562;
-
-            // --- 2. Cover up the old placeholder text and circle ---
+        // This function is now simple, just updating the HTML.
+        function drawPoster(employeeImageSrc, data) {
+            employeePhotoPreview.src = employeeImageSrc;
             
-            // Coordinates from your screenshot for the yellow box
-            const originalRectX = 250;
-            const originalRectY = 650;
-            const originalRectW = 290;
-            const originalRectH = 150;
-
-            const rectX = originalRectX * scaleFactor;
-            const rectY = originalRectY * scaleFactor;
-            const rectW = originalRectW * scaleFactor;
-            const rectH = originalRectH * scaleFactor;
-
-            ctx.fillStyle = '#fde88f'; // Color picked from your image
-            ctx.fillRect(rectX, rectY, rectW, rectH);
-
-            // Coordinates from your screenshot for the blue circle
-            const originalCircleX = 175;
-            const originalCircleY = 680;
-            const originalCircleR = 65; 
-
-            const circleX = originalCircleX * scaleFactor;
-            const circleY = originalCircleY * scaleFactor;
-            const circleR = originalCircleR * scaleFactor;
-
-            ctx.fillStyle = '#00aef0'; // Color picked from your image
-            ctx.beginPath();
-            ctx.arc(circleX, circleY, circleR, 0, Math.PI * 2);
-            ctx.fill();
-
-            // --- 3. Draw the new employee photo ---
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(circleX, circleY, circleR, 0, Math.PI * 2);
-            ctx.closePath();
-            ctx.clip();
-            
-            let sourceX = 0;
-            let sourceY = 0;
-            let sourceSize = Math.min(employeeImage.width, employeeImage.height);
-            if (employeeImage.width > employeeImage.height) {
-                sourceX = (employeeImage.width - sourceSize) / 2;
-            } else {
-                sourceY = (employeeImage.height - sourceSize) / 2;
-            }
-            ctx.drawImage(
-                employeeImage, 
-                sourceX, sourceY, sourceSize, sourceSize, 
-                circleX - circleR, circleY - circleR, circleR * 2, circleR * 2 
-            );
-            ctx.restore();
-
-            // --- 4. Draw the new text ---
-            ctx.fillStyle = '#0a304f'; 
-            ctx.font = 'bold ' + (36 * scaleFactor * 0.9).toFixed(0) + 'px Inter, sans-serif'; // Adjusted font size slightly
-            ctx.textAlign = 'left';
-
-            // Base X position for text (aligned with "Name:" label in background image)
-            const baseTextX = (270 / 562) * canvasWidth; 
-            
-            // Base Y positions for each line, relative to the top of the yellow box
-            let currentTextY = (692 / 1000) * canvasHeight; // Aligned with 'Name'
-            const lineHeight = (30 / 1000) * canvasHeight; // Spacing between lines
-
-            ctx.fillText(`${data.employeeName}`, baseTextX, currentTextY);
-            currentTextY += lineHeight;
-            ctx.fillText(`${data.branch}`, baseTextX, currentTextY);
-            currentTextY += lineHeight;
-            ctx.fillText(`${data.region}`, baseTextX, currentTextY);
-            currentTextY += lineHeight;
-            ctx.fillText(`${data.premium}`, baseTextX, currentTextY);
-            currentTextY += lineHeight;
-            ctx.fillText(`${data.nop}`, baseTextX, currentTextY);
+            pName.innerText = data.employeeName;
+            pBranch.innerText = data.branch;
+            pRegion.innerText = data.region;
+            pPremium.innerText = data.premium;
+            pNop.innerText = data.nop;
         }
 
+        // The new download function using html2canvas
         downloadBtn.addEventListener('click', function() {
-            const imageDataUrl = posterCanvas.toDataURL('image/png');
-            const downloadLink = document.createElement('a');
-            downloadLink.download = `sampoorna-poster.png`;
-            downloadLink.href = imageDataUrl;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+            const posterToDownload = document.getElementById('posterWrapper');
+            
+            // html2canvas options for better quality
+            const options = {
+                scale: 3, // Increase scale for higher resolution
+                useCORS: true // For if images are from other origins
+            };
+
+            html2canvas(posterToDownload, options).then(canvas => {
+                // Convert the canvas to a data URL
+                const imageDataUrl = canvas.toDataURL('image/png');
+                
+                // Create a link to download it
+                const downloadLink = document.createElement('a');
+                downloadLink.download = `sampoorna-poster.png`;
+                downloadLink.href = imageDataUrl;
+                
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            });
         });
     </script>
 </body>
