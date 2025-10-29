@@ -130,8 +130,8 @@
         const loadingIndicator = document.getElementById('loadingIndicator');
         const premiumInput = document.getElementById('premium');
 
-        // Path to your saved background image
-        const templateUrl = './sampoorna-bg.png';
+        // *** THIS LINE IS NOW CORRECTED TO MATCH YOUR FILE NAME ***
+        const templateUrl = './Sampoorna-bg.PNG';
 
         premiumInput.addEventListener('input', function(event) {
             const value = this.value.replace(/[^0-9]/g, '');
@@ -190,8 +190,8 @@
                 
                 employeeImage.onerror = () => { console.error("Employee image failed to load."); checkIfLoaded(); };
                 templateBg.onerror = () => { 
-                    console.error("Template background failed to load. Make sure it's saved as 'sampoorna-bg.png'"); 
-                    showMessage("Error: Could not load 'sampoorna-bg.png'. Make sure it is in the same folder as the HTML file.");
+                    console.error("Template background failed to load. Make sure it's saved as 'Sampoorna-bg.PNG'"); 
+                    showMessage("Error: Could not load 'Sampoorna-bg.PNG'. Make sure it is in the same folder as the HTML file.");
                     loadingIndicator.style.display = 'none';
                     posterForm.style.display = 'flex';
                 };
