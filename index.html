@@ -130,8 +130,8 @@
         const loadingIndicator = document.getElementById('loadingIndicator');
         const premiumInput = document.getElementById('premium');
 
-        // *** THIS LINE IS NOW CORRECTED TO MATCH YOUR FILE NAME ***
-        const templateUrl = './Sampoorna-bg.PNG';
+        // *** THIS LINE IS NOW CORRECTED to match your screenshot (lowercase 's') ***
+        const templateUrl = './sampoorna-bg.PNG';
 
         premiumInput.addEventListener('input', function(event) {
             const value = this.value.replace(/[^0-9]/g, '');
@@ -173,7 +173,7 @@
                 templateBg.src = templateUrl;
                 
                 let loadedCount = 0;
-                const totalToLoad = 2; // We are loading the employee image and the template
+                const totalToLoad = 2; 
                 
                 const checkIfLoaded = () => {
                     loadedCount++;
@@ -190,8 +190,8 @@
                 
                 employeeImage.onerror = () => { console.error("Employee image failed to load."); checkIfLoaded(); };
                 templateBg.onerror = () => { 
-                    console.error("Template background failed to load. Make sure it's saved as 'Sampoorna-bg.PNG'"); 
-                    showMessage("Error: Could not load 'Sampoorna-bg.PNG'. Make sure it is in the same folder as the HTML file.");
+                    console.error("Template background failed to load. Make sure it's saved as 'sampoorna-bg.PNG'"); 
+                    showMessage("Error: Could not load 'sampoorna-bg.PNG'. Make sure it is in the same folder as the HTML file.");
                     loadingIndicator.style.display = 'none';
                     posterForm.style.display = 'flex';
                 };
@@ -221,7 +221,6 @@
 
         function drawPoster(employeeImage, templateBg, data) {
             const canvasWidth = 1080;
-            // 1920 maintains the aspect ratio of your 562x1000 image
             const canvasHeight = 1920; 
             posterCanvas.width = canvasWidth;
             posterCanvas.height = canvasHeight;
@@ -230,7 +229,6 @@
             ctx.drawImage(templateBg, 0, 0, canvasWidth, canvasHeight);
 
             // 2. Cover up the old placeholder text and circle
-            // Coordinates are scaled from your 562x1000 image
             
             // Cover yellow text box
             ctx.fillStyle = '#fde88f'; // Color picked from your image
@@ -244,7 +242,7 @@
             ctx.fillStyle = '#00aef0'; // Color picked from your image
             const circleX = (175 / 562) * canvasWidth;
             const circleY = (680 / 1000) * canvasHeight;
-            const circleR = (65 / 562) * canvasWidth; // Radius scaled by width
+            const circleR = (65 / 562) * canvasWidth; 
             ctx.beginPath();
             ctx.arc(circleX, circleY, circleR, 0, Math.PI * 2);
             ctx.fill();
@@ -256,7 +254,6 @@
             ctx.closePath();
             ctx.clip();
             
-            // Draw image centered in the circle
             let sourceX = 0;
             let sourceY = 0;
             let sourceSize = Math.min(employeeImage.width, employeeImage.height);
@@ -267,19 +264,19 @@
             }
             ctx.drawImage(
                 employeeImage, 
-                sourceX, sourceY, sourceSize, sourceSize, // Source (cropped square)
-                circleX - circleR, circleY - circleR, circleR * 2, circleR * 2 // Destination (fills circle)
+                sourceX, sourceY, sourceSize, sourceSize, 
+                circleX - circleR, circleY - circleR, circleR * 2, circleR * 2 
             );
             ctx.restore();
 
             // 4. Draw the new text
-            ctx.fillStyle = '#0a304f'; // Dark blue text color from image
+            ctx.fillStyle = '#0a304f'; 
             ctx.font = 'bold 36px Inter, sans-serif';
             ctx.textAlign = 'left';
 
-            let textX = rectX + 15; // Start text inside the yellow box
-            let textY = rectY + 45;  // Start Y position
-            const lineHeight = 50;  // Space between lines
+            let textX = rectX + 15; 
+            let textY = rectY + 45;  
+            const lineHeight = 50;  
 
             ctx.fillText(`Name: ${data.employeeName}`, textX, textY);
             textY += lineHeight;
@@ -295,7 +292,6 @@
         downloadBtn.addEventListener('click', function() {
             const imageDataUrl = posterCanvas.toDataURL('image/png');
             const downloadLink = document.createElement('a');
-            // Suggest a filename
             downloadLink.download = `sampoorna-poster.png`;
             downloadLink.href = imageDataUrl;
             document.body.appendChild(downloadLink);
