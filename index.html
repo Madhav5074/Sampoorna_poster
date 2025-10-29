@@ -17,28 +17,22 @@
             margin: auto;
         }
         
-        /* This is the main poster area */
         #posterWrapper {
             position: relative;
-            /* We use the original image's width as the max-width
-               to ensure our % calculations are based on it.
-            */
             width: 100%;
-            max-width: 562px; /* This is the 3375px downscaled by 6x */
+            max-width: 562px; /* Based on original image aspect ratio */
             margin: auto;
             border: 2px solid #e2e8f0;
             border-radius: 1.5rem;
-            overflow: hidden; /* Clips the photo circle */
+            overflow: hidden; 
         }
         
         #posterBg {
-            /* The background image */
             width: 100%;
             height: auto;
-            display: block; /* Removes any bottom spacing */
+            display: block; 
         }
 
-        /* This container holds all the elements layered on top */
         .overlay-container {
             position: absolute;
             top: 0;
@@ -47,76 +41,53 @@
             height: 100%;
         }
 
-        /* This is the employee's photo */
         #employeePhotoPreview {
             position: absolute;
-            /* These are your (X,Y) coordinates converted to percentages
-              Based on your 3375x6030 image
-              Circle Center: (1023, 4290)
-              Estimated Radius: 390px (based on scaling from the template)
-              
-              top: (4290 - 390) / 6030 = 64.67%
-              left: (1023 - 390) / 3375 = 18.75%
-              width: (390 * 2) / 3375 = 23.11%
-              height: (390 * 2) / 6030 = 12.93%
-            */
+            /* Percentages based on your 3375x6030 image */
             top: 64.67%;
             left: 18.75%;
             width: 23.11%;
             height: 12.93%;
             border-radius: 50%;
-            object-fit: cover; /* This makes the image fill the circle nicely */
-            background-color: #00aef0; /* Fallback color */
+            object-fit: cover; 
+            background-color: #00aef0;
         }
 
-        /* This is the class for all text elements */
         .poster-text {
             position: absolute;
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            /* This font-size scales with the poster width.
-              1.55vw is (8.7px / 562px) * 100
-            */
             font-size: 1.55vw; 
-            color: #0a304f; /* Dark blue from poster */
-            white-space: nowrap; /* Prevents text from wrapping */
+            color: #0a304f;
+            white-space: nowrap; 
         }
         
-        /* This sets a fixed font size on larger screens */
         @media (min-width: 562px) {
             .poster-text {
-                /* 1.55vw at 562px = 8.7px. This keeps it consistent. */
                 font-size: 8.7px; 
             }
         }
         
-        /* Here we position each text element using your exact coordinates
-          converted to percentages.
-          
-          Example: Name
-          X: 1485px -> (1485 / 3375) * 100% = 44%
-          Y: 4035px -> (4035 / 6030) * 100% = 66.91%
-        */
-        
+        /* Positions based on your 3375x6030 image coordinates */
         #p-name {
             left: 44%;
             top: 66.91%;
         }
         #p-branch {
             left: 44%;
-            top: 68.60%; /* (4137 / 6030) */
+            top: 68.60%; 
         }
         #p-region {
             left: 44%;
-            top: 70.03%; /* (4223 / 6030) */
+            top: 70.03%; 
         }
         #p-premium {
             left: 44%;
-            top: 71.69%; /* (4323 / 6030) */
+            top: 71.69%; 
         }
         #p-nop {
             left: 44%;
-            top: 73.33%; /* (4422 / 6030) */
+            top: 73.33%; 
         }
         
         #posterContainer, #loadingIndicator {
@@ -188,7 +159,7 @@
         <div id="posterContainer" class="flex flex-col items-center gap-6">
             
             <div id="posterWrapper">
-                <img id="posterBg" src="./sampoorna-bg.PNG" alt="Sampoorna Poster Background">
+                <img id="posterBg" src="./sampoorna-bg.png" alt="Sampoorna Poster Background">
                 
                 <div class="overlay-container">
                     <img id="employeePhotoPreview" src="" alt="Employee Photo">
@@ -207,7 +178,7 @@
     </div>
     
     <div class="version-number">
-        Version 3.3 - Pixel Perfect
+        Version 3.3.1 - Pixel Perfect
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
@@ -226,6 +197,13 @@
         const pRegion = document.getElementById('p-region');
         const pPremium = document.getElementById('p-premium');
         const pNop = document.getElementById('p-nop');
+        
+        // Error handling for the background image
+        const posterBg = document.getElementById('posterBg');
+        posterBg.onerror = function() {
+            // This error will trigger if 'sampoorna-bg.png' is not found
+            showMessage("Error: Could not load 'sampoorna-bg.png'. Make sure it is in the same folder as the HTML file and the name is all lowercase.");
+        };
 
         premiumInput.addEventListener('input', function(event) {
             const value = this.value.replace(/[^0-9]/g, '');
@@ -245,6 +223,12 @@
             if (!file) {
                 showMessage("Please upload an Employee photo.");
                 return;
+            }
+            
+            // Check if background image loaded
+            if (posterBg.complete === false || posterBg.naturalHeight === 0) {
+                 showMessage("Error: Background image 'sampoorna-bg.png' is missing or could not be loaded. Please check the file name and location.");
+                 return;
             }
 
             posterForm.style.display = 'none';
@@ -301,7 +285,7 @@
             const posterToDownload = document.getElementById('posterWrapper');
             
             const options = {
-                scale: 3, // Increase scale for high resolution
+                scale: 3, 
                 useCORS: true,
                 backgroundColor: '#ffffff'
             };
