@@ -66,10 +66,9 @@
         #text-container {
             position: absolute;
             left: 43.34%;
-            /* MOVED UP ~8px */
-            top: 66.67%;   /* Was 66.8% */
+            top: 66.6%;   /* Adjusted slightly for new font size */
             width: 33.89%;
-            height: 9%;
+            height: 9.2%; /* Increased slightly */
 
             display: flex;
             flex-direction: column;
@@ -81,7 +80,8 @@
         .poster-text {
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            font-size: 1.3vw;
+            /* FONT BIGGER: Increased by ~15% from 1.3vw */
+            font-size: 1.5vw;
             color: #0a304f;
             white-space: nowrap;
             line-height: 1.4;
@@ -89,7 +89,8 @@
 
         @media (min-width: 562px) {
             .poster-text {
-                font-size: 7.31px;
+                /* Fixed font size at max width: 1.5 * 5.62 = 8.43px */
+                font-size: 8.43px;
             }
         }
 
@@ -205,7 +206,7 @@
     </div>
 
     <div class="version-number">
-        Version 3.12 - Text Nudge Up
+        Version 3.13 - Font Size Up 15%
     </div>
     <div class="copyright-text">
         Copyright © MADHAV KALRA
