@@ -16,12 +16,11 @@
             max-width: 550px;
             margin: auto;
         }
-
-        /* This is the new poster area */
+        
+        /* This is the new poster area. No more canvas! */
         #posterWrapper {
-            /* This holds our background image.
-              We use the original image's aspect ratio (1000 / 562) 
-              to set the padding-top, making it responsive.
+            /* This is the key: we use the original image's width.
+              The background image will fill this container.
             */
             position: relative;
             width: 100%;
@@ -29,15 +28,17 @@
             margin: auto;
             border: 2px solid #e2e8f0;
             border-radius: 1.5rem;
-            overflow: hidden; /* Clips the photo circle */
+            overflow: hidden; /* This clips the photo circle */
         }
+        
         #posterBg {
+            /* The background image itself */
             width: 100%;
             height: auto;
-            display: block;
+            display: block; /* Removes any bottom spacing */
         }
 
-        /* Container for all overlay elements */
+        /* This container holds all the elements layered on top */
         .overlay-container {
             position: absolute;
             top: 0;
@@ -46,40 +47,49 @@
             height: 100%;
         }
 
-        /* Styles for the employee photo */
+        /* This is the employee's photo */
         #employeePhotoPreview {
             position: absolute;
-            /* Coordinates are percentages based on the template.
-              TWEAK THESE if they are slightly off.
+            /* These % values are calculated from the original image.
+              (top: 647px / 1000px height = 64.7%)
+              (left: 117px / 562px width = 20.8%)
             */
-            top: 64.7%; /* (original 647px / 1000px height) */
-            left: 20.8%;  /* (original 117px / 562px width) */
-            width: 23%;   /* (original 130px / 562px width) */
-            height: 13%;  /* (original 130px / 1000px height) */
+            top: 64.7%;
+            left: 20.8%;
+            width: 23%;   /* (130px / 562px) */
+            height: 13%;  /* (130px / 1000px) */
             border-radius: 50%;
-            object-fit: cover; /* Ensures the image fills the circle */
+            object-fit: cover; /* This makes the image fill the circle nicely */
             background-color: #00aef0; /* Fallback color */
         }
 
-        /* Styles for the text data */
+        /* This is the class for all text elements */
         .poster-text {
             position: absolute;
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            font-size: 1.55vw; /* Scales with container width */
-            color: #0a304f;
-            /* Set a fixed size in a small container to override font-size */
-            @media (min-width: 562px) {
-                font-size: 8.7px; /* 1.55vw at 562px */
+            /* Using 'vw' (viewport width) makes the font scale with the poster size.
+              We use a media query to set a fixed size when the viewport is larger.
+            */
+            font-size: 1.55vw; 
+            color: #0a304f; /* Dark blue from poster */
+            white-space: nowrap; /* Prevents text from wrapping */
+        }
+        
+        /* This sets a fixed font size on larger screens */
+        @media (min-width: 562px) {
+            .poster-text {
+                /* 1.55vw at 562px = 8.7px. This keeps it consistent. */
+                font-size: 8.7px; 
             }
         }
         
-        /* Each text line is positioned absolutely.
-          TWEAK top/left percentages if alignment is off.
+        /* Here we position each text element individually.
+          The % values are calculated from the original image.
         */
         #p-name {
-            top: 65.1%;
-            left: 58.7%;
+            top: 65.1%; /* (651px / 1000px) */
+            left: 58.7%;  /* (330px / 562px) - after the "Name: " label */
         }
         #p-branch {
             top: 67.9%;
@@ -91,14 +101,13 @@
         }
         #p-premium {
             top: 73.5%;
-            left: 73.8%;
+            left: 73.8%; /* Further right, after "Premium Amount: " */
         }
         #p-nop {
             top: 76.3%;
-            left: 55.2%;
+            left: 55.2%; /* After "NOP: " */
         }
         
-        /* Hide all the poster elements by default */
         #posterContainer, #loadingIndicator {
             display: none;
         }
@@ -166,6 +175,7 @@
         </div>
 
         <div id="posterContainer" class="flex flex-col items-center gap-6">
+            
             <div id="posterWrapper">
                 <img id="posterBg" src="./sampoorna-bg.PNG" alt="Sampoorna Poster Background">
                 
@@ -244,8 +254,11 @@
                     nop: document.getElementById('nop').value
                 });
                 
-                loadingIndicator.style.display = 'none';
-                posterContainer.style.display = 'flex';
+                // Use a small timeout to make sure images have rendered
+                setTimeout(() => {
+                    loadingIndicator.style.display = 'none';
+                    posterContainer.style.display = 'flex';
+                }, 100); // 100ms delay
             };
             reader.readAsDataURL(file);
         });
@@ -286,17 +299,19 @@
             
             // html2canvas options for better quality
             const options = {
-                scale: 3, // Increase scale for higher resolution
-                useCORS: true // For if images are from other origins
+                scale: 3, // Increase scale for higher resolution (3x)
+                useCORS: true, // For images from other origins
+                // Set a white background for any potential transparency
+                backgroundColor: '#ffffff' 
             };
 
             html2canvas(posterToDownload, options).then(canvas => {
-                // Convert the canvas to a data URL
+                // Convert the canvas (our "screenshot") to a data URL
                 const imageDataUrl = canvas.toDataURL('image/png');
                 
-                // Create a link to download it
+                // Create a temporary link to download it
                 const downloadLink = document.createElement('a');
-                downloadLink.download = `sampoorna-poster.png`;
+                downloadLink.download = `sampoorna-poster-${Date.now()}.png`;
                 downloadLink.href = imageDataUrl;
                 
                 document.body.appendChild(downloadLink);
